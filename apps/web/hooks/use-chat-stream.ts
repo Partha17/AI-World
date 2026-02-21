@@ -68,6 +68,7 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
 
         const decoder = new TextDecoder();
         let buffer = "";
+        let currentEventType = "";
         let collectedProducts: string[] = [];
         let collectedSuggestions: string[] = [];
 
@@ -82,7 +83,7 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
 
           for (const line of lines) {
             if (line.startsWith("event:")) {
-              const eventType = line.slice(6).trim();
+              currentEventType = line.slice(6).trim();
               continue;
             }
 
@@ -92,6 +93,23 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
 
               try {
                 const data = JSON.parse(dataStr);
+
+                if (currentEventType === "error" && data.error) {
+                  setMessages((prev) => {
+                    const updated = [...prev];
+                    const last = updated[updated.length - 1];
+                    if (last.role === "assistant") {
+                      updated[updated.length - 1] = {
+                        ...last,
+                        content:
+                          "I'm sorry, something went wrong. Please try again.",
+                        isStreaming: false,
+                      };
+                    }
+                    return updated;
+                  });
+                  continue;
+                }
 
                 if (data.content !== undefined) {
                   setMessages((prev) => {

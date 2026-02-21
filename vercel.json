@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npx turbo build --filter=@ai-world/web",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}

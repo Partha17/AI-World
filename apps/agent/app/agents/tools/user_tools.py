@@ -16,7 +16,7 @@ async def get_user_preferences(user_id: str) -> str:
     Args:
         user_id: The user's UUID
     """
-    if not user_id:
+    if not user_id or user_id in ("null", "None", "none", ""):
         return "No user ID provided. Shopping as guest — no preference history available."
 
     context = await get_user_context(user_id)
@@ -72,7 +72,7 @@ async def save_user_preference(
         user_id: The user's UUID
         preference_description: A clear description of the preference learned
     """
-    if not user_id:
+    if not user_id or user_id in ("null", "None", "none", ""):
         return "Cannot save preferences for guest users."
 
     await update_user_preference(user_id, preference_description)
@@ -101,7 +101,7 @@ async def update_user_profile_preferences(
         budget_min: Minimum budget in INR
         budget_max: Maximum budget in INR
     """
-    if not user_id:
+    if not user_id or user_id in ("null", "None", "none", ""):
         return "Cannot update profile for guest users."
 
     await update_profile_preferences(

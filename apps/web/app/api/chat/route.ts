@@ -1,11 +1,13 @@
 import { NextRequest } from "next/server";
 
+export const runtime = "edge";
+
 const AGENT_URL = process.env.AGENT_SERVICE_URL || "http://localhost:8000";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  const response = await fetch(`${AGENT_URL}/agent/chat`, {
+  const agentResponse = await fetch(`${AGENT_URL}/agent/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -15,38 +17,14 @@ export async function POST(request: NextRequest) {
     }),
   });
 
-  if (!response.ok) {
+  if (!agentResponse.ok || !agentResponse.body) {
     return new Response(
       JSON.stringify({ error: "Agent service unavailable" }),
       { status: 502, headers: { "Content-Type": "application/json" } }
     );
   }
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      const reader = response.body?.getReader();
-      if (!reader) {
-        controller.close();
-        return;
-      }
-
-      const decoder = new TextDecoder();
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          controller.enqueue(value);
-        }
-      } catch {
-        // Stream interrupted
-      } finally {
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
+  return new Response(agentResponse.body, {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",

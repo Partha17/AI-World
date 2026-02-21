@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     google_api_key: str = ""
     embedding_model: str = "gemini-embedding-001"
     embedding_dimensions: int = 3072
-    llm_model: str = "gemini-2.5-flash"
+    llm_model: str = "gemini-2.5-flash-lite"
     agent_service_port: int = 8000
     cors_origins: list[str] = ["http://localhost:3000"]
 

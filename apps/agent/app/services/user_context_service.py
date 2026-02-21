@@ -1,13 +1,25 @@
 import json
 import logging
+import re
 from app.db import get_supabase
 from app.services.embedding_service import generate_embedding
 
 logger = logging.getLogger(__name__)
 
+_UUID_RE = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I
+)
+
+
+def _is_valid_user_id(user_id: str | None) -> bool:
+    return bool(user_id and _UUID_RE.match(str(user_id)))
+
 
 async def get_user_profile(user_id: str) -> dict | None:
     """Get user profile with preferences."""
+    if not _is_valid_user_id(user_id):
+        return None
+
     sb = get_supabase()
     rows = await sb.select(
         "user_profiles",
@@ -28,6 +40,9 @@ async def get_user_profile(user_id: str) -> dict | None:
 
 async def get_user_context(user_id: str) -> dict:
     """Get combined user context: profile + recent context summaries."""
+    if not _is_valid_user_id(user_id):
+        return {"profile": None, "recent_contexts": []}
+
     profile = await get_user_profile(user_id)
 
     sb = get_supabase()
