@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #fffbf7;
+  --color-foreground: #1a1a1a;
+  --color-primary: #8b6f47;
+  --color-primary-light: #c4a76c;
+  --color-primary-dark: #5c4a2f;
+  --color-secondary: #d4af37;
+  --color-secondary-light: #f0d060;
+  --color-accent: #b76e79;
+  --color-accent-light: #e8a0aa;
+  --color-muted: #f5f0eb;
+  --color-muted-foreground: #6b6b6b;
+  --color-border: #e8e0d8;
+  --color-card: #ffffff;
+  --color-card-foreground: #1a1a1a;
+  --color-destructive: #dc2626;
+  --color-success: #16a34a;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+  }
+
+  .glass {
+    @apply bg-white/70 backdrop-blur-lg border border-white/20;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(212, 175, 55, 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}

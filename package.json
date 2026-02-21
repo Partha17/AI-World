@@ -1,0 +1,20 @@
+{
+  "name": "ai-world",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "dev:web": "turbo dev --filter=@ai-world/web",
+    "dev:agent": "cd apps/agent && uvicorn app.main:app --reload --port 8000",
+    "build:web": "turbo build --filter=@ai-world/web"
+  },
+  "devDependencies": {
+    "turbo": "^2"
+  },
+  "packageManager": "npm@10.8.0"
+}
