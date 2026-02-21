@@ -1,20 +1,21 @@
 import json
 import logging
-from openai import AsyncOpenAI
+import asyncio
+from google import genai
 from app.config import get_settings
-from app.db import get_pool
+from app.db import get_supabase
 
 logger = logging.getLogger(__name__)
 
-_openai: AsyncOpenAI | None = None
+_client: genai.Client | None = None
 
 
-def _get_openai() -> AsyncOpenAI:
-    global _openai
-    if _openai is None:
+def _get_client() -> genai.Client:
+    global _client
+    if _client is None:
         settings = get_settings()
-        _openai = AsyncOpenAI(api_key=settings.openai_api_key)
-    return _openai
+        _client = genai.Client(api_key=settings.google_api_key)
+    return _client
 
 
 def build_product_text(product: dict) -> str:
@@ -61,45 +62,33 @@ def build_product_text(product: dict) -> str:
 
 
 async def generate_embedding(text: str) -> list[float]:
-    """Generate an embedding vector for the given text."""
+    """Generate an embedding vector using Google Gemini."""
     settings = get_settings()
-    client = _get_openai()
-    response = await client.embeddings.create(
+    client = _get_client()
+
+    result = await asyncio.to_thread(
+        client.models.embed_content,
         model=settings.embedding_model,
-        input=text,
-        dimensions=settings.embedding_dimensions,
+        contents=text,
     )
-    return response.data[0].embedding
+    return result.embeddings[0].values
 
 
 async def embed_products(product_ids: list[str] | None = None) -> int:
-    """
-    Embed products and store in product_embeddings table.
-    If product_ids is None, embeds all active products.
-    Returns the number of products embedded.
-    """
-    pool = await get_pool()
+    """Embed products and store in product_embeddings table via Supabase REST API."""
+    sb = get_supabase()
     settings = get_settings()
+    client = _get_client()
 
+    params = {"is_active": "eq.true", "order": "created_at.desc"}
     if product_ids:
-        placeholders = ", ".join(f"${i+1}" for i in range(len(product_ids)))
-        query = f"""
-            SELECT id, name, description, category, subcategory,
-                   materials, gemstones, style_tags, occasion_tags,
-                   karat, price
-            FROM products
-            WHERE id = ANY(ARRAY[{placeholders}]::uuid[])
-              AND is_active = true
-        """
-        rows = await pool.fetch(query, *product_ids)
-    else:
-        rows = await pool.fetch("""
-            SELECT id, name, description, category, subcategory,
-                   materials, gemstones, style_tags, occasion_tags,
-                   karat, price
-            FROM products
-            WHERE is_active = true
-        """)
+        params["id"] = f"in.({','.join(product_ids)})"
+
+    rows = await sb.select(
+        "products",
+        "id,name,description,category,subcategory,materials,gemstones,style_tags,occasion_tags,karat,price",
+        params,
+    )
 
     if not rows:
         logger.info("No products to embed")
@@ -107,45 +96,30 @@ async def embed_products(product_ids: list[str] | None = None) -> int:
 
     count = 0
     batch_size = 20
-    client = _get_openai()
 
     for i in range(0, len(rows), batch_size):
         batch = rows[i : i + batch_size]
-        texts = []
-        for row in batch:
-            product_dict = dict(row)
-            if isinstance(product_dict.get("materials"), str):
-                product_dict["materials"] = json.loads(product_dict["materials"])
-            if isinstance(product_dict.get("gemstones"), str):
-                product_dict["gemstones"] = json.loads(product_dict["gemstones"])
-            texts.append(build_product_text(product_dict))
+        texts = [build_product_text(row) for row in batch]
 
-        response = await client.embeddings.create(
+        result = await asyncio.to_thread(
+            client.models.embed_content,
             model=settings.embedding_model,
-            input=texts,
-            dimensions=settings.embedding_dimensions,
+            contents=texts,
         )
 
-        for row, embedding_data, text_content in zip(
-            batch, response.data, texts
-        ):
-            embedding = embedding_data.embedding
+        for row, emb_obj, text_content in zip(batch, result.embeddings, texts):
+            embedding = emb_obj.values
             embedding_str = "[" + ",".join(str(x) for x in embedding) + "]"
 
-            await pool.execute(
-                """
-                INSERT INTO product_embeddings (product_id, embedding, text_content, model_version)
-                VALUES ($1, $2::vector, $3, $4)
-                ON CONFLICT (product_id) DO UPDATE
-                SET embedding = $2::vector,
-                    text_content = $3,
-                    model_version = $4,
-                    created_at = now()
-                """,
-                row["id"],
-                embedding_str,
-                text_content,
-                settings.embedding_model,
+            await sb.upsert(
+                "product_embeddings",
+                {
+                    "product_id": row["id"],
+                    "embedding": embedding_str,
+                    "text_content": text_content,
+                    "model_version": settings.embedding_model,
+                },
+                on_conflict="product_id",
             )
             count += 1
 

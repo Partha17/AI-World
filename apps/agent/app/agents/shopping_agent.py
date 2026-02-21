@@ -2,7 +2,7 @@ import json
 import logging
 from typing import Annotated, TypedDict, Sequence
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
@@ -79,9 +79,9 @@ def create_agent():
     """Create and return the LangGraph shopping agent."""
     settings = get_settings()
 
-    llm = ChatOpenAI(
+    llm = ChatGoogleGenerativeAI(
         model=settings.llm_model,
-        api_key=settings.openai_api_key,
+        google_api_key=settings.google_api_key,
         temperature=0.7,
         streaming=True,
     )
@@ -160,8 +160,15 @@ async def run_agent(
         if kind == "on_chat_model_stream":
             chunk = event["data"]["chunk"]
             if hasattr(chunk, "content") and chunk.content:
-                collected_text += chunk.content
-                yield ("text", chunk.content)
+                content = chunk.content
+                if isinstance(content, list):
+                    content = "".join(
+                        part.get("text", "") if isinstance(part, dict) else str(part)
+                        for part in content
+                    )
+                if content:
+                    collected_text += content
+                    yield ("text", content)
 
         elif kind == "on_tool_start":
             tool_name = event.get("name", "")

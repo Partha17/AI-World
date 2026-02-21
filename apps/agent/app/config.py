@@ -7,10 +7,10 @@ class Settings(BaseSettings):
     supabase_key: str = ""
     supabase_service_role_key: str = ""
     database_url: str = ""
-    openai_api_key: str = ""
-    embedding_model: str = "text-embedding-3-small"
-    embedding_dimensions: int = 1536
-    llm_model: str = "gpt-4o"
+    google_api_key: str = ""
+    embedding_model: str = "gemini-embedding-001"
+    embedding_dimensions: int = 3072
+    llm_model: str = "gemini-2.5-flash"
     agent_service_port: int = 8000
     cors_origins: list[str] = ["http://localhost:3000"]
 
