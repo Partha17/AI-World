@@ -14,7 +14,7 @@ from app.services.conversation_service import (
     get_conversation_messages,
 )
 from app.services.embedding_service import embed_products
-from app.services.product_service import get_product_by_id
+from app.services.product_service import get_product_by_id, filter_products
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -131,6 +131,39 @@ async def embed(request: EmbedRequest):
     except Exception as e:
         logger.exception("Error embedding products")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/products/browse")
+async def browse_products(
+    category: str | None = None,
+    subcategory: str | None = None,
+    min_price: float | None = None,
+    max_price: float | None = None,
+    materials: str | None = None,
+    occasion: str | None = None,
+    style: str | None = None,
+    limit: int = 20,
+    offset: int = 0,
+):
+    """Browse products with optional filters for kiosk catalog view."""
+    material_list = [m.strip() for m in materials.split(",")] if materials else None
+    results = await filter_products(
+        category=category,
+        subcategory=subcategory,
+        min_price=min_price,
+        max_price=max_price,
+        materials=material_list,
+        occasion=occasion,
+        style=style,
+        limit=limit + offset,
+    )
+    paginated = results[offset:]
+    return {
+        "products": [r.model_dump() for r in paginated],
+        "total": len(results),
+        "limit": limit,
+        "offset": offset,
+    }
 
 
 @app.get("/products/{product_id}")
