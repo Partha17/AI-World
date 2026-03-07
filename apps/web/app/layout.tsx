@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "JewelAI — Discover Jewelry Through Conversation",
+  title: "JewelAI — Search Jewelry Across Vendors",
   description:
-    "An agentic jewelry marketplace where AI understands your style, occasion, and budget to find the perfect piece.",
+    "AI-powered jewelry search kiosk for gold buildings. Search across multiple vendors with natural language.",
 };
 
 export default function RootLayout({
