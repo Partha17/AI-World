@@ -58,19 +58,13 @@ alter table public.product_embeddings
   alter column embedding type vector(3072);
 
 drop index if exists idx_product_embeddings_ivfflat;
-create index idx_product_embeddings_hnsw
-  on public.product_embeddings
-  using hnsw (embedding vector_cosine_ops)
-  with (m = 16, ef_construction = 64);
+-- pgvector on Supabase caps indexed dims at 2000; 3072-dim vectors use exact scan
+-- which is fast enough for catalog-sized datasets (< 100k products)
 
 alter table public.user_context_vectors
   alter column context_embedding type vector(3072);
 
 drop index if exists idx_user_context_embedding;
-create index idx_user_context_embedding_hnsw
-  on public.user_context_vectors
-  using hnsw (context_embedding vector_cosine_ops)
-  with (m = 16, ef_construction = 64);
 
 -- ============================================================
 -- Update match_products to use 3072 dimensions
