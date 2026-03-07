@@ -191,7 +191,11 @@ async def get_similar(
 @app.get("/buildings/{slug}")
 async def get_building(slug: str):
     """Get building info and vendor list by slug."""
-    detail = await get_building_by_slug(slug)
+    try:
+        detail = await get_building_by_slug(slug)
+    except Exception as e:
+        logger.exception("Error fetching building")
+        raise HTTPException(status_code=500, detail=str(e))
     if not detail:
         raise HTTPException(status_code=404, detail="Building not found")
     return detail
