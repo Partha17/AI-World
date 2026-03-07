@@ -4,16 +4,16 @@ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Search, SlidersHorizontal, X, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ProductGrid } from "@/components/kiosk/product-grid";
-import { FilterPanel } from "@/components/kiosk/filter-panel";
-import { useKiosk } from "@/components/kiosk/kiosk-shell";
+import { ProductGrid } from "@/components/search/product-grid";
+import { FilterPanel } from "@/components/search/filter-panel";
+import { useBuilding } from "@/components/search/building-shell";
 import { trackSearch } from "@/lib/analytics";
 import type { ProductCard, SearchResponse, ParsedQuery } from "@/types";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { building, vendors } = useKiosk();
+  const { building, vendors } = useBuilding();
 
   const initialQuery = searchParams.get("q") || "";
   const initialSeller = searchParams.get("seller") || "";
@@ -103,7 +103,7 @@ export default function SearchPage() {
     if (query) params.set("q", query);
     if (filters.seller_id) params.set("seller", filters.seller_id);
     router.replace(
-      `/kiosk/${building.slug}/search?${params.toString()}`
+      `/${building.slug}/search?${params.toString()}`
     );
     doSearch(query, filters);
   };
@@ -124,7 +124,7 @@ export default function SearchPage() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => router.push(`/kiosk/${building.slug}`)}
+          onClick={() => router.push(`/${building.slug}`)}
           className="shrink-0"
         >
           <ArrowLeft className="h-5 w-5" />

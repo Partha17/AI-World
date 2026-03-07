@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Sparkles, Store, ShieldCheck, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ProductGrid } from "@/components/kiosk/product-grid";
+import { ProductGrid } from "@/components/search/product-grid";
 import type {
   Building,
   BuildingVendor,
@@ -25,7 +25,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   Accessories: "🎩",
 };
 
-export function KioskHome({
+export function BuildingHome({
   building,
   vendors,
   categories,
@@ -43,7 +43,7 @@ export function KioskHome({
   const handleSearch = useCallback(() => {
     if (query.trim()) {
       router.push(
-        `/kiosk/${building.slug}/search?q=${encodeURIComponent(query.trim())}`
+        `/${building.slug}/search?q=${encodeURIComponent(query.trim())}`
       );
     }
   }, [query, building.slug, router]);
@@ -112,7 +112,7 @@ export function KioskHome({
                 onClick={() => {
                   setQuery(q);
                   router.push(
-                    `/kiosk/${building.slug}/search?q=${encodeURIComponent(q)}`
+                    `/${building.slug}/search?q=${encodeURIComponent(q)}`
                   );
                 }}
                 className="rounded-full border border-border bg-white/80 px-3.5 py-1.5 text-xs text-muted-foreground transition-all hover:border-primary/30 hover:text-primary hover:bg-primary/5"
@@ -137,7 +137,7 @@ export function KioskHome({
                   key={cat.category}
                   onClick={() =>
                     router.push(
-                      `/kiosk/${building.slug}/category/${encodeURIComponent(cat.category)}`
+                      `/${building.slug}/category/${encodeURIComponent(cat.category)}`
                     )
                   }
                   className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-background p-4 transition-all hover:border-primary/20 hover:shadow-md hover:shadow-primary/5"
@@ -170,7 +170,7 @@ export function KioskHome({
                 variant="ghost"
                 size="sm"
                 onClick={() =>
-                  router.push(`/kiosk/${building.slug}/search?q=`)
+                  router.push(`/${building.slug}/search?q=`)
                 }
                 className="text-primary"
               >
@@ -197,7 +197,7 @@ export function KioskHome({
                 key={v.seller_id}
                 onClick={() =>
                   router.push(
-                    `/kiosk/${building.slug}/search?q=&seller=${v.seller_id}`
+                    `/${building.slug}/search?q=&seller=${v.seller_id}`
                   )
                 }
                 className="flex items-start gap-4 rounded-xl border border-border p-4 text-left transition-all hover:border-primary/20 hover:shadow-sm"

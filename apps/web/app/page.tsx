@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function Home() {
-  redirect("/kiosk/zaveri-bazaar-mumbai");
+  redirect("/zaveri-bazaar-mumbai");
 }

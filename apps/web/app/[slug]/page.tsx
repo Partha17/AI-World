@@ -1,12 +1,12 @@
 import { apiGet } from "@/lib/api";
 import type { BuildingDetail, CategoryCount, ProductCard } from "@/types";
-import { KioskHome } from "@/components/kiosk/kiosk-home";
+import { BuildingHome } from "@/components/search/building-home";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export default async function KioskHomePage({ params }: Props) {
+export default async function BuildingHomePage({ params }: Props) {
   const { slug } = await params;
 
   const [detail, categoriesData, featuredData] = await Promise.all([
@@ -16,7 +16,7 @@ export default async function KioskHomePage({ params }: Props) {
   ]);
 
   return (
-    <KioskHome
+    <BuildingHome
       building={detail.building}
       vendors={detail.vendors}
       categories={categoriesData.categories}

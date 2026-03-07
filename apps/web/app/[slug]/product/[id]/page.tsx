@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { apiGet } from "@/lib/api";
 import type { BuildingDetail, ProductDetail, SimilarProduct } from "@/types";
-import { ProductView } from "@/components/kiosk/product-view";
+import { ProductView } from "@/components/search/product-view";
 
 interface Props {
   params: Promise<{ slug: string; id: string }>;

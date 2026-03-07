@@ -225,7 +225,7 @@ export function ProductView({
             {similar.map((p) => (
               <Link
                 key={p.id}
-                href={`/kiosk/${buildingSlug}/product/${p.id}`}
+                href={`/${buildingSlug}/product/${p.id}`}
                 className="group rounded-xl border border-border bg-white overflow-hidden hover:border-primary/20 hover:shadow-md transition-all"
               >
                 <div className="relative aspect-square bg-muted">

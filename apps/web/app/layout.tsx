@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "JewelAI — Search Jewelry Across Vendors",
   description:
-    "AI-powered jewelry search kiosk for gold buildings. Search across multiple vendors with natural language.",
+    "AI-powered jewelry search for gold buildings. Search across multiple vendors with natural language.",
 };
 
 export default function RootLayout({

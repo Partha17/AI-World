@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { apiGet } from "@/lib/api";
 import type { BuildingDetail } from "@/types";
-import { KioskShell } from "@/components/kiosk/kiosk-shell";
+import { BuildingShell } from "@/components/search/building-shell";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -14,17 +14,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const data = await apiGet<BuildingDetail>(`/buildings/${slug}`);
     return {
-      title: `${data.building.name} — JewelAI Kiosk`,
+      title: `${data.building.name} — JewelAI`,
       description:
         data.building.branding.welcome_message ||
         `Discover jewelry at ${data.building.name}`,
     };
   } catch {
-    return { title: "JewelAI Kiosk" };
+    return { title: "JewelAI" };
   }
 }
 
-export default async function KioskLayout({ params, children }: Props) {
+export default async function BuildingLayout({ params, children }: Props) {
   const { slug } = await params;
 
   let detail: BuildingDetail;
@@ -35,8 +35,8 @@ export default async function KioskLayout({ params, children }: Props) {
   }
 
   return (
-    <KioskShell building={detail.building} vendors={detail.vendors}>
+    <BuildingShell building={detail.building} vendors={detail.vendors}>
       {children}
-    </KioskShell>
+    </BuildingShell>
   );
 }

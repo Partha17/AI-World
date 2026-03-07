@@ -5,20 +5,20 @@ import Link from "next/link";
 import { Gem, MapPin } from "lucide-react";
 import type { Building, BuildingVendor } from "@/types";
 
-interface KioskContextValue {
+interface BuildingContextValue {
   building: Building;
   vendors: BuildingVendor[];
 }
 
-const KioskContext = createContext<KioskContextValue | null>(null);
+const BuildingContext = createContext<BuildingContextValue | null>(null);
 
-export function useKiosk() {
-  const ctx = useContext(KioskContext);
-  if (!ctx) throw new Error("useKiosk must be used within KioskShell");
+export function useBuilding() {
+  const ctx = useContext(BuildingContext);
+  if (!ctx) throw new Error("useBuilding must be used within BuildingShell");
   return ctx;
 }
 
-export function KioskShell({
+export function BuildingShell({
   building,
   vendors,
   children,
@@ -30,13 +30,13 @@ export function KioskShell({
   const primaryColor = building.branding.primary_color || "#B8860B";
 
   return (
-    <KioskContext.Provider value={{ building, vendors }}>
+    <BuildingContext.Provider value={{ building, vendors }}>
       <div className="min-h-screen flex flex-col bg-background">
         {/* Header */}
         <header className="sticky top-0 z-50 border-b border-border bg-white/95 backdrop-blur-md">
           <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
             <Link
-              href={`/kiosk/${building.slug}`}
+              href={`/${building.slug}`}
               className="flex items-center gap-2.5"
             >
               <div
@@ -89,6 +89,6 @@ export function KioskShell({
           </div>
         </footer>
       </div>
-    </KioskContext.Provider>
+    </BuildingContext.Provider>
   );
 }

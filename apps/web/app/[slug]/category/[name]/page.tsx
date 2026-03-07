@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ProductGrid } from "@/components/kiosk/product-grid";
-import { useKiosk } from "@/components/kiosk/kiosk-shell";
+import { ProductGrid } from "@/components/search/product-grid";
+import { useBuilding } from "@/components/search/building-shell";
 import type { ProductCard } from "@/types";
 import { use } from "react";
 
@@ -17,7 +17,7 @@ export default function CategoryPage({
   const { slug, name } = use(params);
   const category = decodeURIComponent(name);
   const router = useRouter();
-  const { building } = useKiosk();
+  const { building } = useBuilding();
 
   const [products, setProducts] = useState<ProductCard[]>([]);
   const [total, setTotal] = useState(0);
@@ -60,7 +60,7 @@ export default function CategoryPage({
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => router.push(`/kiosk/${slug}`)}
+          onClick={() => router.push(`/${slug}`)}
           className="shrink-0"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -91,7 +91,7 @@ export default function CategoryPage({
             size="sm"
             onClick={() =>
               router.push(
-                `/kiosk/${slug}/search?q=${encodeURIComponent(category)}`
+                `/${slug}/search?q=${encodeURIComponent(category)}`
               )
             }
           >

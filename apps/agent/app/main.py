@@ -209,7 +209,7 @@ async def get_categories(slug: str):
 
 @app.get("/buildings/{slug}/featured")
 async def get_featured(slug: str, limit: int = Query(default=12, ge=1, le=50)):
-    """Get featured/latest products for a building's kiosk home page."""
+    """Get featured/latest products for a building's home page."""
     detail = await get_building_by_slug(slug)
     if not detail:
         raise HTTPException(status_code=404, detail="Building not found")

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { MapPin, ShieldCheck } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { trackClick } from "@/lib/analytics";
-import { useKiosk } from "@/components/kiosk/kiosk-shell";
+import { useBuilding } from "@/components/search/building-shell";
 import type { ProductCard } from "@/types";
 
 export function ProductGrid({
@@ -15,7 +15,7 @@ export function ProductGrid({
   products: ProductCard[];
   buildingSlug: string;
 }) {
-  const { building } = useKiosk();
+  const { building } = useBuilding();
 
   if (products.length === 0) {
     return (
@@ -55,7 +55,7 @@ function ProductCardItem({
 
   return (
     <Link
-      href={`/kiosk/${buildingSlug}/product/${product.id}`}
+      href={`/${buildingSlug}/product/${product.id}`}
       onClick={() => trackClick(buildingId, product.id)}
       className="group rounded-xl border border-border bg-white overflow-hidden transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5"
     >
